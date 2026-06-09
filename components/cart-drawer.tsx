@@ -11,15 +11,88 @@ export function CartDrawer() {
   const { items, isOpen, closeCart, totalCents, removeItem, updateQuantity } = useCart();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [shipping, setShipping] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    postal_code: "",
+    street: "",
+    number: "",
+    complement: "",
+    neighborhood: "",
+    city: "",
+    state: ""
+  });
+  const [shippingError, setShippingError] = useState("");
+
+  function setShippingField(field: keyof typeof shipping, value: string) {
+    setShipping({ ...shipping, [field]: value });
+  }
+
+  function validateShipping() {
+    if (items.length === 0) {
+      setShippingError("Adicione pelo menos um produto ao carrinho.");
+      return false;
+    }
+
+    const requiredFields: Array<keyof typeof shipping> = [
+      "name",
+      "email",
+      "phone",
+      "postal_code",
+      "street",
+      "number",
+      "complement",
+      "neighborhood",
+      "city",
+      "state"
+    ];
+
+    for (const field of requiredFields) {
+      if (!shipping[field].trim()) {
+        setShippingError("Preencha todos os campos de entrega.");
+        return false;
+      }
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(shipping.email)) {
+      setShippingError("Informe um e-mail válido.");
+      return false;
+    }
+
+    const cepDigits = shipping.postal_code.replace(/\D/g, "");
+    if (cepDigits.length !== 8) {
+      setShippingError("Informe um CEP válido com 8 dígitos.");
+      return false;
+    }
+
+    setShippingError("");
+    return true;
+  }
 
   async function checkout() {
+    if (!validateShipping()) return;
+
     setLoading(true);
     setError("");
     const response = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        items: items.map((item) => ({ product_id: item.product.id, quantity: item.quantity }))
+        items: items.map((item) => ({ product_id: item.product.id, quantity: item.quantity })),
+        shipping: {
+          name: shipping.name,
+          email: shipping.email,
+          phone: shipping.phone,
+          postal_code: shipping.postal_code,
+          street: shipping.street,
+          number: shipping.number,
+          complement: shipping.complement,
+          neighborhood: shipping.neighborhood,
+          city: shipping.city,
+          state: shipping.state
+        }
       })
     });
     const payload = await response.json();
@@ -99,6 +172,102 @@ export function CartDrawer() {
                   </div>
                 </div>
               ))}
+
+              <section className="rounded border border-facheiro-linen bg-white p-4">
+                <h2 className="mb-4 text-lg font-semibold text-facheiro-brown">Dados de entrega</h2>
+                <div className="grid gap-3">
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <label className="text-sm">
+                      Nome completo
+                      <input
+                        value={shipping.name}
+                        onChange={(event) => setShippingField("name", event.target.value)}
+                        className="mt-2 w-full border border-facheiro-linen bg-facheiro-off px-3 py-3 outline-none"
+                      />
+                    </label>
+                    <label className="text-sm">
+                      Email
+                      <input
+                        value={shipping.email}
+                        onChange={(event) => setShippingField("email", event.target.value)}
+                        type="email"
+                        className="mt-2 w-full border border-facheiro-linen bg-facheiro-off px-3 py-3 outline-none"
+                      />
+                    </label>
+                  </div>
+                  <label className="text-sm">
+                    Telefone
+                    <input
+                      value={shipping.phone}
+                      onChange={(event) => setShippingField("phone", event.target.value)}
+                      className="mt-2 w-full border border-facheiro-linen bg-facheiro-off px-3 py-3 outline-none"
+                    />
+                  </label>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <label className="text-sm">
+                      CEP
+                      <input
+                        value={shipping.postal_code}
+                        onChange={(event) => setShippingField("postal_code", event.target.value)}
+                        className="mt-2 w-full border border-facheiro-linen bg-facheiro-off px-3 py-3 outline-none"
+                      />
+                    </label>
+                    <label className="text-sm">
+                      Rua
+                      <input
+                        value={shipping.street}
+                        onChange={(event) => setShippingField("street", event.target.value)}
+                        className="mt-2 w-full border border-facheiro-linen bg-facheiro-off px-3 py-3 outline-none"
+                      />
+                    </label>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <label className="text-sm">
+                      Número
+                      <input
+                        value={shipping.number}
+                        onChange={(event) => setShippingField("number", event.target.value)}
+                        className="mt-2 w-full border border-facheiro-linen bg-facheiro-off px-3 py-3 outline-none"
+                      />
+                    </label>
+                    <label className="text-sm">
+                      Complemento
+                      <input
+                        value={shipping.complement}
+                        onChange={(event) => setShippingField("complement", event.target.value)}
+                        className="mt-2 w-full border border-facheiro-linen bg-facheiro-off px-3 py-3 outline-none"
+                      />
+                    </label>
+                    <label className="text-sm">
+                      Bairro
+                      <input
+                        value={shipping.neighborhood}
+                        onChange={(event) => setShippingField("neighborhood", event.target.value)}
+                        className="mt-2 w-full border border-facheiro-linen bg-facheiro-off px-3 py-3 outline-none"
+                      />
+                    </label>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <label className="text-sm">
+                      Cidade
+                      <input
+                        value={shipping.city}
+                        onChange={(event) => setShippingField("city", event.target.value)}
+                        className="mt-2 w-full border border-facheiro-linen bg-facheiro-off px-3 py-3 outline-none"
+                      />
+                    </label>
+                    <label className="text-sm">
+                      Estado
+                      <input
+                        value={shipping.state}
+                        onChange={(event) => setShippingField("state", event.target.value)}
+                        className="mt-2 w-full border border-facheiro-linen bg-facheiro-off px-3 py-3 outline-none"
+                      />
+                    </label>
+                  </div>
+                  {shippingError ? <p className="text-sm text-red-700">{shippingError}</p> : null}
+                </div>
+              </section>
             </div>
           )}
         </div>

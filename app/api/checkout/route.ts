@@ -4,15 +4,28 @@ import { getServiceSupabase } from "@/lib/supabase";
 import type { Product } from "@/lib/types";
 
 const schema = z.object({
-  items: z.array(z.object({ product_id: z.string(), quantity: z.number().int().positive() })).min(1)
+  items: z.array(z.object({ product_id: z.string(), quantity: z.number().int().positive() })).min(1),
+  shipping: z.object({
+    name: z.string().min(1),
+    email: z.string().email(),
+    phone: z.string().min(1),
+    postal_code: z.string().min(1),
+    street: z.string().min(1),
+    number: z.string().min(1),
+    complement: z.string().min(1),
+    neighborhood: z.string().min(1),
+    city: z.string().min(1),
+    state: z.string().min(1)
+  })
 });
 
 export async function POST(request: NextRequest) {
   console.log("CHECKOUT_ROUTE_EXECUTED");
-  const parsed = schema.safeParse(await request.json());
+  const body = await request.json();
+  const parsed = schema.safeParse(body);
   if (!parsed.success) {
-    console.error("CHECKOUT_ERROR_HERE", { reason: "Carrinho inválido", requestBodyPreview: await request.text().catch(() => null) });
-    return NextResponse.json({ error: "Carrinho inválido." }, { status: 400 });
+    console.error("CHECKOUT_ERROR_HERE", { reason: "Carrinho ou dados de entrega inválidos", errors: parsed.error.format(), requestBody: body });
+    return NextResponse.json({ error: "Carrinho ou dados de entrega inválidos." }, { status: 400 });
   }
 
   const supabase = getServiceSupabase();
@@ -48,7 +61,13 @@ export async function POST(request: NextRequest) {
   const total_cents = lines.reduce((sum, line) => sum + line.total, 0);
   const { data: order, error: orderError } = await supabase
     .from("orders")
-    .insert({ status: "pendente", total_cents })
+    .insert({
+      status: "pendente",
+      total_cents,
+      customer_name: parsed.data.shipping.name,
+      customer_email: parsed.data.shipping.email,
+      shipping_address: parsed.data.shipping
+    })
     .select()
     .single();
 
