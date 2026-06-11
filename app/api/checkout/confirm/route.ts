@@ -123,6 +123,9 @@ export async function POST(request: NextRequest) {
     });
 
     const payload = await preference.json();
+    // log payload for local debugging
+    console.info("MERCADO_PAGO_PREFERENCE", { status: preference.status, body: payload });
+
     if (!preference.ok) {
       console.error("CONFIRM_ERROR", { reason: "Mercado Pago error", status: preference.status, body: payload });
       return NextResponse.json({ error: payload.message ?? "Falha no Mercado Pago." }, { status: 400 });
@@ -130,7 +133,10 @@ export async function POST(request: NextRequest) {
 
     await supabase.from("orders").update({ payment_reference: payload.id }).eq("id", order.id);
 
-    return NextResponse.json({ order_id: order.id, init_point: payload.init_point });
+    // fallback: some MP environments may not return init_point; construct redirect URL if needed
+    const initPoint = payload.init_point ?? (payload.id ? `https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=${payload.id}` : null);
+
+    return NextResponse.json({ order_id: order.id, init_point: initPoint });
   } catch (error) {
     console.error("CONFIRM_ERROR", error);
     return NextResponse.json({ error: "Erro ao confirmar pedido." }, { status: 500 });
