@@ -146,7 +146,7 @@ export function CartDrawer() {
                   <div>
                     <div className="flex justify-between gap-3">
                       <div>
-                        <p className="text-sm font-medium">{item.product.name}</p>
+                        <p className="font-serif text-lg uppercase tracking-[0.05em] text-facheiro-brown">{item.product.name}</p>
                         <p className="mt-1 text-xs uppercase text-facheiro-black/55">{item.product.sku}</p>
                       </div>
                       <button className="focus-ring h-8 w-8" onClick={() => removeItem(item.product.id)} aria-label="Remover">
@@ -171,14 +171,14 @@ export function CartDrawer() {
                           <Plus size={14} />
                         </button>
                       </div>
-                      <p className="text-sm">{formatMoney(item.product.price_cents * item.quantity)}</p>
+                      <p className="font-serif text-base text-facheiro-leather">{formatMoney(item.product.price_cents * item.quantity)}</p>
                     </div>
                   </div>
                 </div>
               ))}
 
               <section className="rounded border border-facheiro-linen bg-white p-4">
-                <h2 className="mb-4 text-lg font-semibold text-facheiro-brown">Dados de entrega</h2>
+                <h2 className="mb-4 font-serif text-xl tracking-[0.08em] uppercase text-facheiro-brown">Dados de entrega</h2>
                 <div className="grid gap-3">
                   <div className="grid gap-3 sm:grid-cols-2">
                     <label className="text-sm">
@@ -274,9 +274,9 @@ export function CartDrawer() {
               </section>
 
               <section className="rounded border border-facheiro-linen bg-white p-4">
-                <h2 className="text-lg font-semibold text-facheiro-brown">Frete</h2>
+                <h2 className="font-serif text-xl tracking-[0.08em] uppercase text-facheiro-brown">Frete</h2>
                 <p className="mt-3 text-sm text-facheiro-black/70">Valor fixo de frete para todos os pedidos.</p>
-                <p className="mt-4 text-lg font-semibold">{formatMoney(2990)}</p>
+                <p className="mt-4 font-serif text-lg text-facheiro-leather">{formatMoney(2990)}</p>
               </section>
             </div>
           )}
@@ -285,20 +285,20 @@ export function CartDrawer() {
           <div className="mb-4 space-y-3 text-sm">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <strong>{formatMoney(totalCents)}</strong>
+              <strong className="font-serif text-base text-facheiro-brown">{formatMoney(totalCents)}</strong>
             </div>
             <div className="flex justify-between">
               <span>Frete</span>
-              <strong>{formatMoney(shippingCents)}</strong>
+              <strong className="font-serif text-base text-facheiro-brown">{formatMoney(shippingCents)}</strong>
             </div>
             <div className="flex justify-between border-t border-facheiro-linen pt-4 font-semibold">
-              <span>Total</span>
-              <strong>{formatMoney(orderTotalCents)}</strong>
+              <span className="font-serif text-lg uppercase tracking-[0.05em] text-facheiro-brown">Total</span>
+              <strong className="font-serif text-2xl text-facheiro-leather">{formatMoney(orderTotalCents)}</strong>
             </div>
           </div>
           {error ? <p className="mb-3 text-sm text-red-700">{error}</p> : null}
           <button
-            className="focus-ring w-full bg-facheiro-brown px-5 py-4 text-sm uppercase tracking-[0.16em] text-facheiro-off disabled:cursor-not-allowed disabled:opacity-50"
+            className="focus-ring w-full bg-facheiro-brown px-5 py-4 font-serif text-base uppercase tracking-[0.18em] text-facheiro-off hover:bg-facheiro-leather transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50"
             disabled={!items.length || loading}
             onClick={checkout}
           >

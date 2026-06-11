@@ -43,18 +43,18 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           ))}
         </div>
         <aside className="lg:sticky lg:top-28 lg:self-start">
-          <p className="text-xs uppercase tracking-[0.18em] text-facheiro-black/55">{product.category_name}</p>
+          <p className="font-serif text-sm uppercase tracking-[0.18em] text-facheiro-black/55">{product.category_name}</p>
           <h1 className="mt-2 font-serif text-6xl leading-none text-facheiro-brown">{product.name}</h1>
-          <p className="mt-6 text-xl">{formatMoney(product.price_cents)}</p>
+          <p className="mt-6 font-serif text-3xl tracking-[0.05em] text-facheiro-leather">{formatMoney(product.price_cents)}</p>
           <p className="mt-1 text-sm text-facheiro-black/60">{installments(product.price_cents)}</p>
           <p className="mt-7 leading-7 text-facheiro-black/75">{product.description}</p>
           <div className="mt-7">
             {soldOut ? <p className="mb-3 text-sm text-facheiro-black/60">Peça esgotada no momento.</p> : null}
             <AddToCartButton product={product} />
           </div>
-          <div className="mt-8 border-t border-facheiro-linen pt-5 text-sm leading-7 text-facheiro-black/65">
-            <p>SKU: {product.sku}</p>
-            <p>Estoque: {soldOut ? "esgotado" : `${product.stock} disponível(is)`}</p>
+          <div className="mt-8 border-t border-facheiro-linen pt-5 font-serif text-sm uppercase tracking-[0.08em] leading-7 text-facheiro-black/65">
+            <p>SKU: <span className="font-sans normal-case text-facheiro-black/80">{product.sku}</span></p>
+            <p>Estoque: <span className="font-sans normal-case text-facheiro-black/80">{soldOut ? "esgotado" : `${product.stock} disponível(is)`}</span></p>
           </div>
         </aside>
       </section>

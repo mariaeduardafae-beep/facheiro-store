@@ -32,7 +32,7 @@ export function Header() {
       <div className="container-page grid grid-cols-[1fr_auto_1fr] items-center py-3">
         <nav className="hidden items-center gap-7 md:flex">
           {menu.map(([label, href]) => (
-            <Link key={href} href={href} className="focus-ring text-sm uppercase tracking-[0.14em] text-facheiro-black/75">
+            <Link key={href} href={href} className="focus-ring font-serif text-lg uppercase tracking-[0.12em] text-facheiro-brown hover:text-facheiro-leather transition-colors duration-200">
               {label}
             </Link>
           ))}
@@ -57,7 +57,7 @@ export function Header() {
       </div>
       <nav className="container-page flex gap-5 overflow-x-auto pb-3 md:hidden">
         {menu.map(([label, href]) => (
-          <Link key={href} href={href} className="focus-ring shrink-0 text-xs uppercase tracking-[0.14em] text-facheiro-black/75">
+          <Link key={href} href={href} className="focus-ring shrink-0 font-serif text-base uppercase tracking-[0.12em] text-facheiro-brown hover:text-facheiro-leather transition-colors duration-200">
             {label}
           </Link>
         ))}

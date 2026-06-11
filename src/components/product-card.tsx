@@ -31,11 +31,11 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
         <div className="mt-3">
           <p className="font-serif text-2xl leading-tight text-facheiro-brown">{product.name}</p>
-          <p className="mt-1 text-sm">{formatMoney(product.price_cents)}</p>
+          <p className="mt-1 font-serif text-xl tracking-[0.05em] text-facheiro-leather">{formatMoney(product.price_cents)}</p>
         </div>
       </Link>
       <button
-        className="focus-ring mt-3 w-full border border-facheiro-brown px-3 py-3 text-xs uppercase tracking-[0.16em] text-facheiro-brown transition-colors hover:bg-facheiro-brown hover:text-facheiro-off disabled:border-facheiro-black/25 disabled:text-facheiro-black/40"
+        className="focus-ring mt-3 w-full border border-facheiro-brown px-3 py-3 font-serif text-sm uppercase tracking-[0.18em] text-facheiro-brown transition-colors hover:bg-facheiro-brown hover:text-facheiro-off disabled:border-facheiro-black/25 disabled:text-facheiro-black/40"
         disabled={soldOut}
         onClick={() => addItem(product)}
       >

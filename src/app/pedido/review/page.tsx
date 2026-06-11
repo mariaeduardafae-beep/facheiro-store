@@ -98,13 +98,13 @@ export default function OrderReview() {
             {orderData.items.map((item) => (
               <div key={item.product_id} className="flex justify-between border-b border-facheiro-linen pb-4">
                 <div>
-                  <p className="font-medium">{item.name}</p>
-                  <p className="text-sm text-facheiro-black/60">SKU: {item.sku}</p>
+                  <p className="font-serif text-lg uppercase tracking-[0.05em] text-facheiro-brown">{item.name}</p>
+                  <p className="text-xs text-facheiro-black/60">SKU: {item.sku}</p>
                   <p className="text-sm">Quantidade: {item.quantity}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium">{formatMoney(item.total_cents)}</p>
-                  <p className="text-sm text-facheiro-black/60">{formatMoney(item.unit_price_cents)} cada</p>
+                  <p className="font-serif text-lg text-facheiro-leather">{formatMoney(item.total_cents)}</p>
+                  <p className="text-xs text-facheiro-black/60">{formatMoney(item.unit_price_cents)} cada</p>
                 </div>
               </div>
             ))}
@@ -131,19 +131,19 @@ export default function OrderReview() {
         </section>
 
         <section className="mt-6 rounded border border-facheiro-linen bg-white p-6">
-          <h2 className="font-serif text-2xl text-facheiro-brown">Resumo do pedido</h2>
+          <h2 className="font-serif text-2xl uppercase tracking-[0.08em] text-facheiro-brown">Resumo do pedido</h2>
           <div className="mt-4 space-y-3">
             <div className="flex justify-between text-sm">
               <span>Subtotal</span>
-              <strong>{formatMoney(orderData.subtotal_cents)}</strong>
+              <strong className="font-serif text-base text-facheiro-brown">{formatMoney(orderData.subtotal_cents)}</strong>
             </div>
             <div className="flex justify-between text-sm">
               <span>Frete ({orderData.shipping_quote.name})</span>
-              <strong>{formatMoney(orderData.shipping_cents)}</strong>
+              <strong className="font-serif text-base text-facheiro-brown">{formatMoney(orderData.shipping_cents)}</strong>
             </div>
-            <div className="flex justify-between border-t border-facheiro-linen pt-3 font-serif text-lg">
-              <span>Total</span>
-              <strong>{formatMoney(orderData.total_cents)}</strong>
+            <div className="flex justify-between border-t border-facheiro-linen pt-3 font-semibold">
+              <span className="font-serif text-lg uppercase tracking-[0.05em] text-facheiro-brown">Total</span>
+              <strong className="font-serif text-2xl text-facheiro-leather">{formatMoney(orderData.total_cents)}</strong>
             </div>
           </div>
         </section>
@@ -151,12 +151,12 @@ export default function OrderReview() {
         <div className="mt-8 grid gap-3 sm:grid-cols-2">
           <Link
             href="/"
-            className="focus-ring rounded border border-facheiro-brown px-6 py-3 text-center text-sm uppercase tracking-[0.16em] text-facheiro-brown"
+            className="focus-ring rounded border border-facheiro-brown px-6 py-4 text-center font-serif text-base uppercase tracking-[0.18em] text-facheiro-brown transition-colors duration-200 hover:bg-facheiro-brown/5"
           >
             Voltar ao carrinho
           </Link>
           <button
-            className="focus-ring rounded bg-facheiro-brown px-6 py-3 text-sm uppercase tracking-[0.16em] text-facheiro-off disabled:cursor-not-allowed disabled:opacity-50"
+            className="focus-ring rounded bg-facheiro-brown px-6 py-4 font-serif text-base uppercase tracking-[0.18em] text-facheiro-off transition-colors duration-200 hover:bg-facheiro-leather disabled:cursor-not-allowed disabled:opacity-50"
             onClick={confirmOrder}
             disabled={loading}
           >
