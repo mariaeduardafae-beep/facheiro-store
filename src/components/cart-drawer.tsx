@@ -74,10 +74,9 @@ export function CartDrawer() {
   async function checkout() {
     if (!validateShipping()) return;
 
-
     setLoading(true);
     setError("");
-    const response = await fetch("/api/checkout", {
+    const response = await fetch("/api/checkout/review", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -99,10 +98,11 @@ export function CartDrawer() {
     const payload = await response.json();
     setLoading(false);
     if (!response.ok) {
-      setError(payload.error ?? "Não foi possível iniciar o checkout.");
+      setError(payload.error ?? "Não foi possível processar o pedido.");
       return;
     }
-    window.location.href = payload.init_point;
+    localStorage.setItem("pending_order", JSON.stringify(payload.order_data));
+    window.location.href = "/pedido/review";
   }
 
   const shippingCents = 2990;
