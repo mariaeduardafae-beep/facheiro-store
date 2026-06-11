@@ -74,6 +74,7 @@ export function CartDrawer() {
   async function checkout() {
     if (!validateShipping()) return;
 
+
     setLoading(true);
     setError("");
     const response = await fetch("/api/checkout", {
@@ -103,6 +104,9 @@ export function CartDrawer() {
     }
     window.location.href = payload.init_point;
   }
+
+  const shippingCents = 2990;
+  const orderTotalCents = totalCents + shippingCents;
 
   return (
     <div className={`fixed inset-0 z-50 ${isOpen ? "pointer-events-auto" : "pointer-events-none"}`}>
@@ -268,13 +272,29 @@ export function CartDrawer() {
                   {shippingError ? <p className="text-sm text-red-700">{shippingError}</p> : null}
                 </div>
               </section>
+
+              <section className="rounded border border-facheiro-linen bg-white p-4">
+                <h2 className="text-lg font-semibold text-facheiro-brown">Frete</h2>
+                <p className="mt-3 text-sm text-facheiro-black/70">Valor fixo de frete para todos os pedidos.</p>
+                <p className="mt-4 text-lg font-semibold">{formatMoney(2990)}</p>
+              </section>
             </div>
           )}
         </div>
         <footer className="border-t border-facheiro-linen p-5">
-          <div className="mb-4 flex justify-between text-sm">
-            <span>Subtotal</span>
-            <strong>{formatMoney(totalCents)}</strong>
+          <div className="mb-4 space-y-3 text-sm">
+            <div className="flex justify-between">
+              <span>Subtotal</span>
+              <strong>{formatMoney(totalCents)}</strong>
+            </div>
+            <div className="flex justify-between">
+              <span>Frete</span>
+              <strong>{formatMoney(shippingCents)}</strong>
+            </div>
+            <div className="flex justify-between border-t border-facheiro-linen pt-4 font-semibold">
+              <span>Total</span>
+              <strong>{formatMoney(orderTotalCents)}</strong>
+            </div>
           </div>
           {error ? <p className="mb-3 text-sm text-red-700">{error}</p> : null}
           <button

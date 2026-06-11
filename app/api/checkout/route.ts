@@ -58,7 +58,14 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const total_cents = lines.reduce((sum, line) => sum + line.total, 0);
+  const shippingQuote = {
+    service: "fixed",
+    name: "Frete fixo Melhor Envio",
+    price: 29.9,
+    price_cents: 2990,
+    delivery_time: 7
+  };
+  const total_cents = lines.reduce((sum, line) => sum + line.total, 0) + shippingQuote.price_cents;
   const { data: order, error: orderError } = await supabase
     .from("orders")
     .insert({
@@ -66,7 +73,8 @@ export async function POST(request: NextRequest) {
       total_cents,
       customer_name: parsed.data.shipping.name,
       customer_email: parsed.data.shipping.email,
-      shipping_address: parsed.data.shipping
+      shipping_address: parsed.data.shipping,
+      shipping_quote: shippingQuote
     })
     .select()
     .single();
@@ -111,13 +119,22 @@ export async function POST(request: NextRequest) {
         pending: `${siteUrl}/pedido/${order.id}?status=pendente`
       },
       auto_return: "approved",
-      items: lines.map((line) => ({
-        id: line.product.sku,
-        title: line.product.name,
-        quantity: line.quantity,
-        currency_id: "BRL",
-        unit_price: line.product.price_cents / 100
-      }))
+      items: [
+        ...lines.map((line) => ({
+          id: line.product.sku,
+          title: line.product.name,
+          quantity: line.quantity,
+          currency_id: "BRL",
+          unit_price: line.product.price_cents / 100
+        })),
+        {
+          id: "FRETE",
+          title: "Frete fixo",
+          quantity: 1,
+          currency_id: "BRL",
+          unit_price: shippingQuote.price_cents / 100
+        }
+      ]
     })
   });
 

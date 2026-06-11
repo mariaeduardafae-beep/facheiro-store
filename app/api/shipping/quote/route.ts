@@ -16,21 +16,24 @@ export async function POST(request: NextRequest) {
   const parsed = schema.safeParse(await request.json());
   if (!parsed.success) return NextResponse.json({ error: "Dados de frete inválidos." }, { status: 400 });
 
-  const token = process.env.MELHOR_ENVIO_TOKEN;
+  const token = process.env.MELHOR_ENVIO_ACCESS_TOKEN ?? process.env.MELHOR_ENVIO_TOKEN;
   if (!token) return NextResponse.json({ error: "Melhor Envio não configurado." }, { status: 503 });
 
-  const baseUrl = process.env.MELHOR_ENVIO_BASE_URL ?? "https://www.melhorenvio.com.br/api/v2";
+  const storePostalCode = process.env.STORE_POSTAL_CODE;
+  if (!storePostalCode) return NextResponse.json({ error: "CEP da loja não configurado." }, { status: 503 });
+
+  const baseUrl = process.env.MELHOR_ENVIO_BASE_URL ?? "https://sandbox.melhorenvio.com.br/api/v2";
   const response = await fetch(`${baseUrl}/me/shipment/calculate`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       Accept: "application/json",
       "Content-Type": "application/json",
-      "User-Agent": "Facheiro e-commerce"
+      "User-Agent": process.env.MELHOR_ENVIO_USER_AGENT ?? "Facheiro Store (suporte@facheiro.com.br)"
     },
     body: JSON.stringify({
-      from: { postal_code: process.env.STORE_POSTAL_CODE },
-      to: { postal_code: parsed.data.toPostalCode },
+      from: { postal_code: storePostalCode },
+      to: { postal_code: parsed.data.toPostalCode.replace(/\D/g, "") },
       products: parsed.data.items.map((item) => ({
         id: item.id,
         width: 12,
@@ -42,13 +45,12 @@ export async function POST(request: NextRequest) {
       })),
       options: {
         receipt: false,
-        own_hand: false,
-        collect: false
+        own_hand: false
       }
     })
   });
 
   const payload = await response.json();
   if (!response.ok) return NextResponse.json({ error: payload.message ?? "Falha ao calcular frete." }, { status: 400 });
-  return NextResponse.json({ quotes: payload });
+  return NextResponse.json({ quotes: payload.data ?? payload });
 }
