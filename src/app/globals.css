@@ -53,3 +53,14 @@ textarea {
 .focus-ring:focus-visible {
   outline-color: #4a2e20;
 }
+
+.bg-facheiro-pattern-light {
+  background-image: url('/facheiro-pattern-light.svg');
+  background-repeat: repeat;
+}
+
+.bg-facheiro-pattern-dark {
+  background-image: url('/facheiro-pattern-dark.svg');
+  background-repeat: repeat;
+}
+

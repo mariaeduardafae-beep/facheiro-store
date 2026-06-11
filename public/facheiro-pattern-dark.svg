@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <defs>
+    <g id="cactus">
+      <path d="M 0,35 L 0,-28" />
+      <path d="M -3,-26 L 0,-30 L 3,-26" />
+      <path d="M 0,-30 L 0,-33" />
+      
+      <path d="M 0,25 C -7,25 -9,17 -9,5 L -9,-12" />
+      <path d="M -12,-10 L -9,-14 L -6,-10" />
+      <path d="M -9,-14 L -9,-17" />
+      
+      <path d="M 0,25 C 7,25 9,17 9,5 L 9,-12" />
+      <path d="M 6,-10 L 9,-14 L 12,-10" />
+      <path d="M 9,-14 L 9,-17" />
+      
+      <path d="M 0,30 C -15,30 -17,17 -17,0 L -17,-20" />
+      <path d="M -20,-18 L -17,-22 L -14,-18" />
+      <path d="M -17,-22 L -17,-25" />
+      
+      <path d="M 0,30 C 15,30 17,17 17,0 L 17,-20" />
+      <path d="M 14,-18 L 17,-22 L 20,-18" />
+      <path d="M 17,-22 L 17,-25" />
+    </g>
+  </defs>
+  
+  <style>
+    .cactus-use {
+      fill: none;
+      stroke: #F3F1EC;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0.045;
+    }
+  </style>
+
+  <use href="#cactus" x="40" y="40" class="cactus-use" />
+  <use href="#cactus" x="120" y="120" class="cactus-use" />
+  <use href="#cactus" class="cactus-use" transform="translate(120, 40) rotate(180)" />
+  <use href="#cactus" class="cactus-use" transform="translate(40, 120) rotate(180)" />
+</svg>

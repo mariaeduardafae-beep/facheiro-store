@@ -88,7 +88,7 @@ export default function OrderReview() {
   }
 
   return (
-    <main className="container-page py-14">
+    <main className="container-page py-10 md:py-14 bg-facheiro-pattern-light rounded-xl border border-facheiro-linen/50 px-6 md:px-12 my-6">
       <div className="max-w-2xl">
         <h1 className="font-serif text-5xl text-facheiro-brown">Revise seu pedido</h1>
 

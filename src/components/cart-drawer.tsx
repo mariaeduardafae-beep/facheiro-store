@@ -129,7 +129,32 @@ export function CartDrawer() {
         </header>
         <div className="flex-1 overflow-auto px-5 py-4">
           {items.length === 0 ? (
-            <p className="pt-12 text-center text-sm text-facheiro-black/70">Seu carrinho está vazio.</p>
+            <div className="flex flex-col items-center justify-center py-20 px-4 text-center bg-facheiro-pattern-light rounded border border-dashed border-facheiro-linen my-4">
+              <svg viewBox="0 0 100 100" className="h-20 w-auto text-facheiro-brown/20 fill-none stroke-current stroke-[2.2] mb-5" style={{ strokeLinecap: "round", strokeLinejoin: "round" }}>
+                <path d="M 50,90 L 50,25" />
+                <path d="M 47,27 L 50,23 L 52,27" />
+                <path d="M 50,23 L 50,20" />
+                <path d="M 50,80 C 44,80 42,73 42,62 L 42,38" />
+                <path d="M 39,40 L 42,36 L 45,40" />
+                <path d="M 42,36 L 42,33" />
+                <path d="M 50,80 C 56,80 58,73 58,62 L 58,38" />
+                <path d="M 56,40 L 59,36 L 62,40" />
+                <path d="M 59,36 L 59,33" />
+                <path d="M 50,85 C 34,85 32,73 32,57 L 32,32" />
+                <path d="M 29,34 L 32,30 L 35,34" />
+                <path d="M 32,30 L 32,27" />
+                <path d="M 50,85 C 66,85 68,73 68,57 L 68,32" />
+                <path d="M 65,34 L 68,30 L 71,34" />
+                <path d="M 68,30 L 68,27" />
+              </svg>
+              <p className="font-serif text-xl text-facheiro-brown uppercase tracking-widest">Seu carrinho está vazio</p>
+              <p className="mt-2 text-xs text-facheiro-black/60 max-w-[240px]">
+                Navegue pelas nossas coleções e adicione peças autorais à sua coleção.
+              </p>
+              <button onClick={closeCart} className="focus-ring mt-6 border border-facheiro-brown px-5 py-2.5 font-serif text-xs uppercase tracking-[0.16em] text-facheiro-brown hover:bg-facheiro-brown hover:text-facheiro-off transition-colors duration-200">
+                Voltar às compras
+              </button>
+            </div>
           ) : (
             <div className="space-y-5">
               {items.map((item) => (

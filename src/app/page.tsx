@@ -81,7 +81,7 @@ export default async function Home() {
         <ProductGrid products={featured} />
       </section>
 
-      <section className="bg-facheiro-brown py-16 text-facheiro-off md:py-24">
+      <section className="bg-facheiro-brown bg-facheiro-pattern-dark py-16 text-facheiro-off md:py-24">
         <div className="container-page">
           <h2 className="max-w-4xl font-serif text-6xl leading-[0.95] md:text-8xl">
             Criadas para serem usadas. Feitas para durar.
