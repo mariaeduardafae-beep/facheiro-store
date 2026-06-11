@@ -1,7 +1,12 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
+  content: [
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
+    "./src/components/**/*.{js,ts,jsx,tsx}"
+  ],
   theme: {
     extend: {
       colors: {
@@ -14,9 +19,9 @@ const config: Config = {
         }
       },
       fontFamily: {
-        serif: ["var(--font-cormorant)", "Cormorant Garamond", "serif"],
-        display: ["var(--font-ivar)", "Cormorant Garamond", "serif"],
-        sans: ["var(--font-inter)", "Inter", "sans-serif"]
+        serif: ["var(--font-din-condensed)", "DIN Condensed", "sans-serif"],
+        display: ["var(--font-din-condensed)", "DIN Condensed", "sans-serif"],
+        sans: ["var(--font-din-medium)", "DIN Medium", "sans-serif"]
       }
     }
   },
