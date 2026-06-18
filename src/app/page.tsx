@@ -14,7 +14,7 @@ export default async function Home() {
     <main>
       <section className="relative min-h-[78svh] overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1800&q=88"
+          src="/hero-facheiro.jpg"
           alt="Peça Facheiro em fotografia editorial com luz natural"
           fill
           priority
@@ -24,7 +24,7 @@ export default async function Home() {
         <div className="absolute inset-0 bg-gradient-to-t from-facheiro-black/45 via-facheiro-black/10 to-transparent" />
         <div className="container-page relative flex min-h-[78svh] items-end pb-16">
           <div className="max-w-xl text-facheiro-off">
-            <h1 className="font-serif text-6xl leading-[0.95] md:text-8xl">Feitas para permanecer.</h1>
+            <h1 className="font-serif text-6xl leading-[0.95] md:text-8xl">para permanecer.</h1>
             <p className="mt-5 max-w-md text-base leading-7 md:text-lg">
               Peças criadas para atravessar tendências e fazer parte da sua história.
             </p>
@@ -59,7 +59,7 @@ export default async function Home() {
 
       <section className="relative min-h-[58svh] overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&w=1800&q=86"
+          src="/autoral-foto.jpg"
           alt="Textura clara em composição editorial"
           fill
           className="object-cover"

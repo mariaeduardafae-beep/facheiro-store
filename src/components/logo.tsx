@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export function Logo() {
   return (
-    <Link href="/" aria-label="Facheiro" className="flex items-center gap-2">
+    <Link href="/" aria-label="Facheiro" className="flex items-center gap-2 mx-auto">
       <Image
         src="/logo-facheiro-tres.png"
         alt="Facheiro icon"

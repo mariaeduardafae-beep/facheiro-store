@@ -1,9 +1,9 @@
 import type { Category, Product } from "@/lib/types";
 
-const editorial = "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1600&q=85";
-const linen = "https://images.unsplash.com/photo-1604014237800-1c9102c219da?auto=format&fit=crop&w=1400&q=85";
-const stone = "https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&w=1400&q=85";
-const wood = "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1400&q=85";
+const editorial = "/categoria-acessorios.png";
+const linen = "/hero-facheiro.jpg";
+const stone = "/categoria-pulseiras.png";
+const wood = "/categoria-brincos.png";
 const light = "https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?auto=format&fit=crop&w=1400&q=85";
 
 export const demoCategories: Category[] = [
