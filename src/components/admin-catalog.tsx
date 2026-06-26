@@ -71,116 +71,141 @@ export function AdminCatalog({
   async function saveProduct(event: FormEvent) {
     event.preventDefault();
     setMessage("");
-    const response = await fetch("/api/admin/products", {
-      method: form.id ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json", "x-admin-token": token },
-      body: JSON.stringify({
-        ...form,
-        price_cents: Number(form.price_cents),
-        stock: Number(form.stock),
-        images: form.images.split(/\n|,/).map((image) => image.trim()).filter(Boolean)
-      })
-    });
-    const payload = await response.json();
-    if (!response.ok) {
-      setMessage(payload.error ?? "Não foi possível salvar.");
-      return;
+    try {
+      const response = await fetch("/api/admin/products", {
+        method: form.id ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json", "x-admin-token": token },
+        body: JSON.stringify({
+          ...form,
+          price_cents: Number(form.price_cents),
+          stock: Number(form.stock),
+          images: form.images.split(/\n|,/).map((image) => image.trim()).filter(Boolean)
+        })
+      });
+      const payload = await response.json();
+      if (!response.ok) {
+        setMessage(payload.error ?? "Não foi possível salvar.");
+        return;
+      }
+      setProducts(payload.products);
+      setForm({ ...emptyForm, category_id: categories[0]?.id ?? "" });
+      setMessage("Produto salvo com sucesso.");
+    } catch (err: any) {
+      console.error(err);
+      setMessage(`Erro ao salvar produto: ${err.message || err}`);
     }
-    setProducts(payload.products);
-    setForm({ ...emptyForm, category_id: categories[0]?.id ?? "" });
-    setMessage("Produto salvo.");
   }
 
   async function removeProduct(productId: string) {
     setMessage("");
-    const response = await fetch(`/api/admin/products?id=${productId}`, {
-      method: "DELETE",
-      headers: { "x-admin-token": token }
-    });
-    const payload = await response.json();
-    if (!response.ok) {
-      setMessage(payload.error ?? "Não foi possível remover.");
-      return;
+    try {
+      const response = await fetch(`/api/admin/products?id=${productId}`, {
+        method: "DELETE",
+        headers: { "x-admin-token": token }
+      });
+      const payload = await response.json();
+      if (!response.ok) {
+        setMessage(payload.error ?? "Não foi possível remover.");
+        return;
+      }
+      setProducts(payload.products);
+      setMessage("Produto removido com sucesso.");
+    } catch (err: any) {
+      console.error(err);
+      setMessage(`Erro ao remover produto: ${err.message || err}`);
     }
-    setProducts(payload.products);
-    setMessage("Produto removido.");
   }
 
   async function addCategory(event: FormEvent) {
     event.preventDefault();
-    const response = await fetch("/api/admin/categories", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-admin-token": token },
-      body: JSON.stringify({ name: categoryName })
-    });
-    const payload = await response.json();
-    if (!response.ok) {
-      setMessage(payload.error ?? "Não foi possível criar categoria.");
-      return;
+    try {
+      const response = await fetch("/api/admin/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-token": token },
+        body: JSON.stringify({ name: categoryName })
+      });
+      const payload = await response.json();
+      if (!response.ok) {
+        setMessage(payload.error ?? "Não foi possível criar categoria.");
+        return;
+      }
+      setCategories(payload.categories);
+      setCategoryName("");
+      setMessage("Categoria criada com sucesso.");
+    } catch (err: any) {
+      console.error(err);
+      setMessage(`Erro ao criar categoria: ${err.message || err}`);
     }
-    setCategories(payload.categories);
-    setCategoryName("");
-    setMessage("Categoria criada.");
   }
 
   async function toggleProductStatus(product: Product) {
     setMessage("");
-    const newStatus: Product["status"] = product.status === "active" ? "draft" : "active";
-    const response = await fetch("/api/admin/products", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", "x-admin-token": token },
-      body: JSON.stringify({
-        id: product.id,
-        sku: product.sku,
-        name: product.name,
-        slug: product.slug,
-        category_id: product.category_id,
-        description: product.description,
-        price_cents: product.price_cents,
-        stock: product.stock,
-        images: product.images,
-        featured: product.featured,
-        best_seller: product.best_seller,
-        status: newStatus
-      })
-    });
-    const payload = await response.json();
-    if (!response.ok) {
-      setMessage(payload.error ?? "Não foi possível alterar o status.");
-      return;
+    try {
+      const newStatus: Product["status"] = product.status === "active" ? "draft" : "active";
+      const response = await fetch("/api/admin/products", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "x-admin-token": token },
+        body: JSON.stringify({
+          id: product.id,
+          sku: product.sku,
+          name: product.name,
+          slug: product.slug,
+          category_id: product.category_id,
+          description: product.description,
+          price_cents: product.price_cents,
+          stock: product.stock,
+          images: product.images,
+          featured: product.featured,
+          best_seller: product.best_seller,
+          status: newStatus
+        })
+      });
+      const payload = await response.json();
+      if (!response.ok) {
+        setMessage(payload.error ?? "Não foi possível alterar o status.");
+        return;
+      }
+      setProducts(payload.products);
+      setMessage(`Produto "${product.name}" ${newStatus === "active" ? "ativado" : "desativado"} com sucesso.`);
+    } catch (err: any) {
+      console.error(err);
+      setMessage(`Erro ao alterar status: ${err.message || err}`);
     }
-    setProducts(payload.products);
-    setMessage(`Produto "${product.name}" ${newStatus === "active" ? "ativado" : "desativado"} com sucesso.`);
   }
 
   async function updateStock(product: Product, newStock: number) {
     if (newStock < 0) return;
     setMessage("");
-    const response = await fetch("/api/admin/products", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", "x-admin-token": token },
-      body: JSON.stringify({
-        id: product.id,
-        sku: product.sku,
-        name: product.name,
-        slug: product.slug,
-        category_id: product.category_id,
-        description: product.description,
-        price_cents: product.price_cents,
-        stock: newStock,
-        images: product.images,
-        featured: product.featured,
-        best_seller: product.best_seller,
-        status: product.status
-      })
-    });
-    const payload = await response.json();
-    if (!response.ok) {
-      setMessage(payload.error ?? "Não foi possível atualizar o estoque.");
-      return;
+    try {
+      const response = await fetch("/api/admin/products", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "x-admin-token": token },
+        body: JSON.stringify({
+          id: product.id,
+          sku: product.sku,
+          name: product.name,
+          slug: product.slug,
+          category_id: product.category_id,
+          description: product.description,
+          price_cents: product.price_cents,
+          stock: newStock,
+          images: product.images,
+          featured: product.featured,
+          best_seller: product.best_seller,
+          status: product.status
+        })
+      });
+      const payload = await response.json();
+      if (!response.ok) {
+        setMessage(payload.error ?? "Não foi possível atualizar o estoque.");
+        return;
+      }
+      setProducts(payload.products);
+      setMessage(`Estoque de "${product.name}" atualizado para ${newStock}.`);
+    } catch (err: any) {
+      console.error(err);
+      setMessage(`Erro ao atualizar estoque: ${err.message || err}`);
     }
-    setProducts(payload.products);
-    setMessage(`Estoque de "${product.name}" atualizado para ${newStock}.`);
   }
 
   return (
