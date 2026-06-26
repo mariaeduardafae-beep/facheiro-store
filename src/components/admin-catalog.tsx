@@ -123,6 +123,66 @@ export function AdminCatalog({
     setMessage("Categoria criada.");
   }
 
+  async function toggleProductStatus(product: Product) {
+    setMessage("");
+    const newStatus: Product["status"] = product.status === "active" ? "draft" : "active";
+    const response = await fetch("/api/admin/products", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "x-admin-token": token },
+      body: JSON.stringify({
+        id: product.id,
+        sku: product.sku,
+        name: product.name,
+        slug: product.slug,
+        category_id: product.category_id,
+        description: product.description,
+        price_cents: product.price_cents,
+        stock: product.stock,
+        images: product.images,
+        featured: product.featured,
+        best_seller: product.best_seller,
+        status: newStatus
+      })
+    });
+    const payload = await response.json();
+    if (!response.ok) {
+      setMessage(payload.error ?? "Não foi possível alterar o status.");
+      return;
+    }
+    setProducts(payload.products);
+    setMessage(`Produto "${product.name}" ${newStatus === "active" ? "ativado" : "desativado"} com sucesso.`);
+  }
+
+  async function updateStock(product: Product, newStock: number) {
+    if (newStock < 0) return;
+    setMessage("");
+    const response = await fetch("/api/admin/products", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "x-admin-token": token },
+      body: JSON.stringify({
+        id: product.id,
+        sku: product.sku,
+        name: product.name,
+        slug: product.slug,
+        category_id: product.category_id,
+        description: product.description,
+        price_cents: product.price_cents,
+        stock: newStock,
+        images: product.images,
+        featured: product.featured,
+        best_seller: product.best_seller,
+        status: product.status
+      })
+    });
+    const payload = await response.json();
+    if (!response.ok) {
+      setMessage(payload.error ?? "Não foi possível atualizar o estoque.");
+      return;
+    }
+    setProducts(payload.products);
+    setMessage(`Estoque de "${product.name}" atualizado para ${newStock}.`);
+  }
+
   return (
     <div className="grid gap-8 lg:grid-cols-[360px_1fr]">
       <section className="border border-facheiro-linen p-4">
@@ -262,17 +322,84 @@ export function AdminCatalog({
 
         <div className="space-y-3">
           {sortedProducts.map((product) => (
-            <article key={product.id} className="border border-facheiro-linen p-4">
+            <article key={product.id} className="border border-facheiro-linen p-4 bg-facheiro-off/30 hover:bg-facheiro-off/60 transition-colors duration-300">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h3 className="font-serif text-3xl text-facheiro-brown">{product.name}</h3>
-                  <p className="text-sm text-facheiro-black/65">{product.sku} · {formatMoney(product.price_cents)} · estoque {product.stock}</p>
+                  <p className="text-sm text-facheiro-black/65">{product.sku} · {formatMoney(product.price_cents)}</p>
                 </div>
-                <span className="text-xs uppercase tracking-[0.14em] text-facheiro-black/55">{product.status}</span>
+                <div className="flex items-center gap-2">
+                  <span className={`inline-block w-2.5 h-2.5 rounded-full ${product.status === "active" ? "bg-emerald-600" : "bg-facheiro-linen"}`} />
+                  <span className="text-xs uppercase tracking-[0.14em] text-facheiro-black/55">
+                    {product.status === "active" ? "Ativo" : product.status === "draft" ? "Rascunho" : "Arquivado"}
+                  </span>
+                </div>
               </div>
-              <div className="mt-4 flex gap-2">
-                <button onClick={() => edit(product)} className="border border-facheiro-brown px-4 py-2 text-xs uppercase tracking-[0.14em] text-facheiro-brown">Editar</button>
-                <button onClick={() => removeProduct(product.id)} className="border border-facheiro-linen px-4 py-2 text-xs uppercase tracking-[0.14em]">Remover</button>
+
+              {/* Quick stock editor */}
+              <div className="mt-4 flex items-center gap-3 border-t border-facheiro-linen/30 pt-3">
+                <span className="text-xs uppercase tracking-[0.14em] text-facheiro-black/55">Estoque Rápido:</span>
+                <div className="flex items-center">
+                  <button
+                    type="button"
+                    onClick={() => updateStock(product, product.stock - 1)}
+                    disabled={product.stock <= 0}
+                    className="flex h-8 w-8 items-center justify-center border border-facheiro-linen bg-transparent hover:bg-facheiro-linen/20 text-facheiro-brown font-bold disabled:opacity-40 select-none"
+                  >
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    value={product.stock}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value, 10);
+                      if (!isNaN(val) && val >= 0) {
+                        updateStock(product, val);
+                      }
+                    }}
+                    className="h-8 w-14 border-y border-facheiro-linen bg-transparent text-center text-sm outline-none [-moz-appearance:_textfield] [&::-webkit-outer-spin-button]:margin-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:margin-0 [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => updateStock(product, product.stock + 1)}
+                    className="flex h-8 w-8 items-center justify-center border border-facheiro-linen bg-transparent hover:bg-facheiro-linen/20 text-facheiro-brown font-bold select-none"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div className="mt-4 flex flex-wrap gap-2 border-t border-facheiro-linen/30 pt-3">
+                <button
+                  type="button"
+                  onClick={() => edit(product)}
+                  className="border border-facheiro-brown px-4 py-2 text-xs uppercase tracking-[0.14em] text-facheiro-brown hover:bg-facheiro-brown hover:text-facheiro-off transition-all duration-300"
+                >
+                  Editar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => toggleProductStatus(product)}
+                  className={`border px-4 py-2 text-xs uppercase tracking-[0.14em] transition-all duration-300 ${
+                    product.status === "active"
+                      ? "border-facheiro-linen text-facheiro-black/70 hover:bg-facheiro-linen/10"
+                      : "border-emerald-600 text-emerald-700 hover:bg-emerald-50"
+                  }`}
+                >
+                  {product.status === "active" ? "Desativar" : "Ativar"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (confirm(`Tem certeza que deseja remover permanentemente o produto "${product.name}"?`)) {
+                      removeProduct(product.id);
+                    }
+                  }}
+                  className="border border-red-200 px-4 py-2 text-xs uppercase tracking-[0.14em] text-red-600 hover:bg-red-50 transition-all duration-300 ml-auto"
+                >
+                  Remover
+                </button>
               </div>
             </article>
           ))}
