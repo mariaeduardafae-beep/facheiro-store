@@ -166,7 +166,8 @@ export function AdminCatalog({
         return;
       }
       setProducts(payload.products);
-      setMessage(`Produto "${product.name}" ${newStatus === "active" ? "ativado" : "desativado"} com sucesso.`);
+      const statusLabel = product.status === "archived" ? "reativado" : newStatus === "active" ? "ativado" : "desativado";
+      setMessage(`Produto "${product.name}" ${statusLabel} com sucesso.`);
     } catch (err: any) {
       console.error(err);
       setMessage(`Erro ao alterar status: ${err.message || err}`);
@@ -289,29 +290,38 @@ export function AdminCatalog({
                   setMessage("");
                   setUploading(true);
 
-                  const formData = new FormData();
-                  Array.from(files).forEach((file) => formData.append("images", file));
+                  try {
+                    const formData = new FormData();
+                    Array.from(files).forEach((file) => formData.append("images", file));
 
-                  const response = await fetch("/api/admin/uploads", {
-                    method: "POST",
-                    headers: { "x-admin-token": token },
-                    body: formData
-                  });
+                    const response = await fetch("/api/admin/uploads", {
+                      method: "POST",
+                      headers: { "x-admin-token": token },
+                      body: formData
+                    });
 
-                  const payload = await response.json();
-                  setUploading(false);
+                    const payload = await response.json();
 
-                  if (!response.ok) {
-                    setMessage(payload.error ?? "Erro ao enviar as imagens.");
-                    return;
+                    if (!response.ok) {
+                      setMessage(payload.error ?? "Erro ao enviar as imagens.");
+                      return;
+                    }
+
+                    if (Array.isArray(payload.urls) && payload.urls.length > 0) {
+                      setForm((current) => ({
+                        ...current,
+                        images: [current.images, ...payload.urls].filter(Boolean).join("\n")
+                      }));
+                      setMessage("Imagens enviadas com sucesso.");
+                    }
+
+                    if (fileInputRef.current) fileInputRef.current.value = "";
+                  } catch (err: any) {
+                    console.error(err);
+                    setMessage(`Erro ao enviar as imagens: ${err.message || err}`);
+                  } finally {
+                    setUploading(false);
                   }
-
-                  if (Array.isArray(payload.urls) && payload.urls.length > 0) {
-                    setForm({ ...form, images: [form.images, ...payload.urls].filter(Boolean).join("\n") });
-                    setMessage("Imagens enviadas com sucesso.");
-                  }
-
-                  if (fileInputRef.current) fileInputRef.current.value = "";
                 }}
                 className="hidden"
               />
@@ -412,7 +422,7 @@ export function AdminCatalog({
                       : "border-emerald-600 text-emerald-700 hover:bg-emerald-50"
                   }`}
                 >
-                  {product.status === "active" ? "Desativar" : "Ativar"}
+                  {product.status === "active" ? "Desativar" : product.status === "archived" ? "Reativar" : "Ativar"}
                 </button>
                 <button
                   type="button"

@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import fs from "fs/promises";
+import path from "path";
 import { isAdminRequest, slugify } from "@/lib/admin";
 import { getProducts } from "@/lib/catalog";
 import { getServiceSupabase } from "@/lib/supabase";
 import { getLocalProducts, saveLocalProducts, getLocalCategories } from "@/lib/local-db";
 import type { Product } from "@/lib/types";
+
+const LOCAL_UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "products");
 
 const schema = z.object({
   id: z.string().optional(),
@@ -47,10 +51,12 @@ export async function DELETE(request: NextRequest) {
     }
   }
 
-  // Local DB Fallback
   try {
     const products = getLocalProducts();
-    const updatedProducts = products.filter((p) => p.id !== id);
+    const productToDelete = products.find((product) => product.id === id);
+    await removeLocalProductImages(productToDelete?.images ?? []);
+
+    const updatedProducts = products.filter((product) => product.id !== id);
     saveLocalProducts(updatedProducts);
     return NextResponse.json({ products: updatedProducts });
   } catch (localErr: any) {
@@ -81,11 +87,10 @@ async function upsertProduct(request: NextRequest) {
     }
   }
 
-  // Local DB Fallback
   try {
     const products = getLocalProducts();
     const categories = getLocalCategories();
-    const cat = categories.find((c) => c.id === productData.category_id);
+    const cat = categories.find((category) => category.id === productData.category_id);
 
     const fullProduct: Product = {
       id: productData.id || `prod-${Math.random().toString(36).substring(2, 11)}`,
@@ -101,13 +106,13 @@ async function upsertProduct(request: NextRequest) {
       images: productData.images,
       featured: productData.featured,
       best_seller: productData.best_seller,
-      status: productData.status as any,
+      status: productData.status as Product["status"]
     };
 
     let updatedProducts: Product[];
     if (productData.id) {
-      updatedProducts = products.map((p) => (p.id === productData.id ? fullProduct : p));
-      if (!updatedProducts.some((p) => p.id === productData.id)) {
+      updatedProducts = products.map((product) => (product.id === productData.id ? fullProduct : product));
+      if (!updatedProducts.some((product) => product.id === productData.id)) {
         updatedProducts.push(fullProduct);
       }
     } else {
@@ -119,4 +124,24 @@ async function upsertProduct(request: NextRequest) {
   } catch (localErr: any) {
     return NextResponse.json({ error: `Erro ao salvar localmente: ${localErr.message}` }, { status: 500 });
   }
+}
+
+async function removeLocalProductImages(images: string[]) {
+  const localImages = images.filter((image) => image.startsWith("/uploads/products/"));
+  if (localImages.length === 0) return;
+
+  await fs.mkdir(LOCAL_UPLOAD_DIR, { recursive: true });
+
+  await Promise.all(
+    localImages.map(async (image) => {
+      const fileName = image.split("/").pop();
+      if (!fileName) return;
+
+      try {
+        await fs.unlink(path.join(LOCAL_UPLOAD_DIR, fileName));
+      } catch (error) {
+        console.warn("Não foi possível remover a imagem local do produto:", error);
+      }
+    })
+  );
 }
