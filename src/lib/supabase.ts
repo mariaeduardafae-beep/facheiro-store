@@ -1,11 +1,20 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const rawSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const publicKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_SECRET_KEY;
+
+function normalizeSupabaseUrl(url?: string) {
+  if (!url) return null;
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+  return trimmed.replace(/\/rest\/v1\/?$/, "").replace(/\/+$/, "");
+}
+
+const supabaseUrl = normalizeSupabaseUrl(rawSupabaseUrl);
 
 export function hasSupabaseConfig() {
-  return Boolean(supabaseUrl && anonKey);
+  return Boolean(supabaseUrl && publicKey);
 }
 
 export function hasSupabaseServiceConfig() {
@@ -13,8 +22,8 @@ export function hasSupabaseServiceConfig() {
 }
 
 export function getPublicSupabase() {
-  if (!supabaseUrl || !anonKey) return null;
-  return createClient(supabaseUrl, anonKey);
+  if (!supabaseUrl || !publicKey) return null;
+  return createClient(supabaseUrl, publicKey);
 }
 
 export function getServiceSupabase() {
@@ -22,4 +31,13 @@ export function getServiceSupabase() {
   return createClient(supabaseUrl, serviceKey, {
     auth: { persistSession: false }
   });
+}
+
+export function getSupabaseConnectionInfo() {
+  return {
+    hasUrl: Boolean(supabaseUrl),
+    hasPublicKey: Boolean(publicKey),
+    hasServiceKey: Boolean(serviceKey),
+    urlLooksLikeApiEndpoint: Boolean(rawSupabaseUrl?.includes("/rest/v1"))
+  };
 }
