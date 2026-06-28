@@ -5,6 +5,7 @@ import { CartDrawer } from "@/components/cart-drawer";
 import { CartProvider } from "@/components/cart-provider";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
+import { WhatsappFab } from "@/components/whatsapp-fab";
 
 const dinCondensed = localFont({
   src: [{ path: "../public/fonts/din-condensed-bold-maisfontes.93e1/din-condensed-bold.ttf", weight: "700", style: "normal" }],
@@ -26,10 +27,10 @@ export const metadata: Metadata = {
     default: "Facheiro | Feitas para permanecer",
     template: "%s | Facheiro"
   },
-  description: "Peças autorais brasileiras criadas para atravessar tendências e fazer parte da sua história.",
+  description: "PeÃ§as autorais brasileiras criadas para atravessar tendÃªncias e fazer parte da sua histÃ³ria.",
   openGraph: {
     title: "Facheiro",
-    description: "Peças autorais brasileiras criadas para permanecer.",
+    description: "PeÃ§as autorais brasileiras criadas para permanecer.",
     url: siteUrl,
     siteName: "Facheiro",
     type: "website",
@@ -46,6 +47,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           {children}
           <Footer />
           <CartDrawer />
+          <WhatsappFab />
         </CartProvider>
       </body>
     </html>
