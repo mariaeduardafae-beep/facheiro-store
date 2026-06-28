@@ -1,14 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
 import { isAdminRequest } from "@/lib/admin";
 import { getServiceSupabase } from "@/lib/supabase";
 
-const LOCAL_UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "products");
-
 export async function POST(request: NextRequest) {
   if (!isAdminRequest(request)) {
-    return NextResponse.json({ error: "Token inválido." }, { status: 401 });
+    return NextResponse.json({ error: "Token invalido." }, { status: 401 });
   }
 
   let formData: FormData;
@@ -24,75 +20,51 @@ export async function POST(request: NextRequest) {
   }
 
   const supabase = getServiceSupabase();
-  const urls: string[] = [];
+  if (!supabase) {
+    return NextResponse.json(
+      {
+        error:
+          "Supabase nao esta configurado para upload no ambiente. Verifique NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY."
+      },
+      { status: 503 }
+    );
+  }
 
   try {
+    try {
+      await supabase.storage.createBucket("products", {
+        public: true,
+        fileSizeLimit: 5242880,
+        allowedMimeTypes: ["image/jpeg", "image/png", "image/webp", "image/gif"]
+      });
+    } catch (bucketError) {
+      console.log("Bucket creation status/error:", bucketError);
+    }
+
+    const urls: string[] = [];
+
     for (const file of files) {
-      const supabaseUrl = supabase ? await uploadToSupabase(supabase, file) : null;
-      if (supabaseUrl) {
-        urls.push(supabaseUrl);
-        continue;
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      const fileExt = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage.from("products").upload(fileName, buffer, {
+        contentType: file.type || "image/jpeg",
+        upsert: true
+      });
+
+      if (uploadError) {
+        return NextResponse.json({ error: `Falha ao enviar imagem para o Supabase: ${uploadError.message}` }, { status: 500 });
       }
 
-      urls.push(await saveLocalUpload(file));
+      const { data } = supabase.storage.from("products").getPublicUrl(fileName);
+      urls.push(data.publicUrl);
     }
 
     return NextResponse.json({ urls });
   } catch (error: any) {
     console.error("Error in upload api route:", error);
-    return NextResponse.json(
-      { error: error.message || "Erro interno no servidor." },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error.message || "Erro interno no servidor." }, { status: 500 });
   }
-}
-
-async function uploadToSupabase(supabase: NonNullable<ReturnType<typeof getServiceSupabase>>, file: File) {
-  try {
-    await supabase.storage.createBucket("products", {
-      public: true,
-      fileSizeLimit: 5242880,
-      allowedMimeTypes: ["image/jpeg", "image/png", "image/webp", "image/gif"]
-    });
-  } catch (bucketError) {
-    console.log("Bucket creation status/error:", bucketError);
-  }
-
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-  const fileExt = file.name.split(".").pop()?.toLowerCase() || "jpg";
-  const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-
-  try {
-    const { error: uploadError } = await supabase.storage
-      .from("products")
-      .upload(fileName, buffer, {
-        contentType: file.type || "image/jpeg",
-        upsert: true
-      });
-
-    if (uploadError) {
-      console.warn("Supabase storage upload error, using local fallback:", uploadError.message);
-      return null;
-    }
-
-    const { data } = supabase.storage.from("products").getPublicUrl(fileName);
-    return data.publicUrl;
-  } catch (error) {
-    console.warn("Supabase upload crashed, using local fallback:", error);
-    return null;
-  }
-}
-
-async function saveLocalUpload(file: File) {
-  await fs.mkdir(LOCAL_UPLOAD_DIR, { recursive: true });
-
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-  const fileExt = file.name.split(".").pop()?.toLowerCase() || "jpg";
-  const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-  const absolutePath = path.join(LOCAL_UPLOAD_DIR, fileName);
-
-  await fs.writeFile(absolutePath, buffer);
-  return `/uploads/products/${fileName}`;
 }

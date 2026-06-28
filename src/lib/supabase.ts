@@ -8,6 +8,10 @@ export function hasSupabaseConfig() {
   return Boolean(supabaseUrl && anonKey);
 }
 
+export function hasSupabaseServiceConfig() {
+  return Boolean(supabaseUrl && serviceKey);
+}
+
 export function getPublicSupabase() {
   if (!supabaseUrl || !anonKey) return null;
   return createClient(supabaseUrl, anonKey);

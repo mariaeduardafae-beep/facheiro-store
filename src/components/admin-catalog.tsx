@@ -35,10 +35,12 @@ const emptyForm: ProductForm = {
 
 export function AdminCatalog({
   initialProducts,
-  initialCategories
+  initialCategories,
+  supabaseReady
 }: {
   initialProducts: Product[];
   initialCategories: Category[];
+  supabaseReady: boolean;
 }) {
   const [token, setToken] = useState("");
   const [products, setProducts] = useState(initialProducts);
@@ -84,7 +86,7 @@ export function AdminCatalog({
       });
       const payload = await response.json();
       if (!response.ok) {
-        setMessage(payload.error ?? "Não foi possível salvar.");
+        setMessage(payload.error ?? "Nao foi possivel salvar.");
         return;
       }
       setProducts(payload.products);
@@ -105,7 +107,7 @@ export function AdminCatalog({
       });
       const payload = await response.json();
       if (!response.ok) {
-        setMessage(payload.error ?? "Não foi possível remover.");
+        setMessage(payload.error ?? "Nao foi possivel remover.");
         return;
       }
       setProducts(payload.products);
@@ -126,7 +128,7 @@ export function AdminCatalog({
       });
       const payload = await response.json();
       if (!response.ok) {
-        setMessage(payload.error ?? "Não foi possível criar categoria.");
+        setMessage(payload.error ?? "Nao foi possivel criar categoria.");
         return;
       }
       setCategories(payload.categories);
@@ -162,7 +164,7 @@ export function AdminCatalog({
       });
       const payload = await response.json();
       if (!response.ok) {
-        setMessage(payload.error ?? "Não foi possível alterar o status.");
+        setMessage(payload.error ?? "Nao foi possivel alterar o status.");
         return;
       }
       setProducts(payload.products);
@@ -198,7 +200,7 @@ export function AdminCatalog({
       });
       const payload = await response.json();
       if (!response.ok) {
-        setMessage(payload.error ?? "Não foi possível atualizar o estoque.");
+        setMessage(payload.error ?? "Nao foi possivel atualizar o estoque.");
         return;
       }
       setProducts(payload.products);
@@ -212,7 +214,12 @@ export function AdminCatalog({
   return (
     <div className="grid gap-8 lg:grid-cols-[360px_1fr]">
       <section className="border border-facheiro-linen p-4">
-        <label className="block text-xs uppercase tracking-[0.16em] text-facheiro-black/60">Token de administração</label>
+        {!supabaseReady ? (
+          <div className="mb-4 border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+            O Supabase nao esta pronto para o admin. Verifique `NEXT_PUBLIC_SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`.
+          </div>
+        ) : null}
+        <label className="block text-xs uppercase tracking-[0.16em] text-facheiro-black/60">Token de administracao</label>
         <input
           value={token}
           onChange={(event) => setToken(event.target.value)}
@@ -256,7 +263,7 @@ export function AdminCatalog({
               </select>
             </label>
             <label className="text-sm">
-              Descrição
+              Descricao
               <textarea
                 value={form.description}
                 onChange={(event) => setForm({ ...form, description: event.target.value })}
@@ -264,7 +271,7 @@ export function AdminCatalog({
               />
             </label>
             <div className="grid grid-cols-2 gap-3">
-              <Input label="Preço em centavos" value={form.price_cents} onChange={(price_cents) => setForm({ ...form, price_cents })} />
+              <Input label="Preco em centavos" value={form.price_cents} onChange={(price_cents) => setForm({ ...form, price_cents })} />
               <Input label="Estoque" value={form.stock} onChange={(stock) => setForm({ ...form, stock })} />
             </div>
             <label className="text-sm">
@@ -371,9 +378,8 @@ export function AdminCatalog({
                 </div>
               </div>
 
-              {/* Quick stock editor */}
               <div className="mt-4 flex items-center gap-3 border-t border-facheiro-linen/30 pt-3">
-                <span className="text-xs uppercase tracking-[0.14em] text-facheiro-black/55">Estoque Rápido:</span>
+                <span className="text-xs uppercase tracking-[0.14em] text-facheiro-black/55">Estoque Rapido:</span>
                 <div className="flex items-center">
                   <button
                     type="button"
@@ -404,7 +410,6 @@ export function AdminCatalog({
                 </div>
               </div>
 
-              {/* Action buttons */}
               <div className="mt-4 flex flex-wrap gap-2 border-t border-facheiro-linen/30 pt-3">
                 <button
                   type="button"
