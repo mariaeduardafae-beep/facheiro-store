@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { getProducts } from "@/lib/catalog";
 import { ProductGrid } from "@/components/product-grid";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Busca",
   description: "Busque peças Facheiro por nome ou categoria."

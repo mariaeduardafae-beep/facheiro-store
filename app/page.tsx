@@ -3,6 +3,9 @@ import Link from "next/link";
 import { getCategories, getProducts } from "@/lib/catalog";
 import { ProductGrid } from "@/components/product-grid";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function Home() {
   const [categories, featured, bestSellers] = await Promise.all([
     getCategories(),
@@ -96,7 +99,6 @@ export default async function Home() {
         </div>
         <ProductGrid products={bestSellers} />
       </section>
-
     </main>
   );
 }

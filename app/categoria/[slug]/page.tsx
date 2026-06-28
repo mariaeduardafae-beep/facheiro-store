@@ -3,10 +3,8 @@ import { notFound } from "next/navigation";
 import { getCategories, getCategoryBySlug, getProducts } from "@/lib/catalog";
 import { ProductGrid } from "@/components/product-grid";
 
-export async function generateStaticParams() {
-  const categories = await getCategories();
-  return categories.map((category) => ({ slug: category.slug }));
-}
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
